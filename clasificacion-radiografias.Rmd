@@ -1,0 +1,175 @@
+---
+title: "Clasificación de imagenes de radiografias de tórax entre normales y con derrame"
+subtitle: "Machine Learning - PEC 1"
+author: "Jorge Vallejo Ortega"
+date: '`r format(Sys.Date(),"%e de %B, %Y")`'
+output:
+  html_document: 
+      toc: true
+      toc_float: true
+  pdf_document:
+      toc: true
+# Next code for knitting both types of documents automatically comes from https://stackoverflow.com/questions/39662365/knit-one-markdown-file-to-two-output-files/53280491#53280491
+knit: (function(inputFile, encoding) {
+  rmarkdown::render(inputFile, encoding = encoding,
+  output_format = "all") })
+bibliography: scholar.bib
+---
+
+```{r setup, include=FALSE}
+# knitr options
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+```{r libraries, include=FALSE}
+# Install packages
+# Load packages
+# ...
+
+library(knitr)
+```
+
+# Índice
+
+# Algoritmo k-NN
+
+El algoritmo de los k vecinos más próximos (_k-nearest neighbours_) es un algoritmo de aprendizaje automático (_machine learning_) que se utiliza para clasificar observaciones, según si sus características las hacen más parecidas a uno u otro grupo ya establecidos.  
+
+En una primera fase de 'entrenamiento', una colección de observaciones ya clasificadas se distribuyen en un espacio _n_-dimensional. Cada dimensión corresponde a una de las variables medidas en las observaciones. Las nuevas observaciones, las cuales queremos clasificar, se distribuyen a su vez en ese espacio _n_-dimensional; y se clasifican dentro de los grupos a los que pertenezcan aquellas otras observaciones, ya clasificadas, de las que más cerca se encuentren. El número de observaciones conocidas que tenemos en cuenta para clasificar las observaciones nuevas, es ése número _k_.
+
+
+## Fortalezas y debilidades del algoritmo
+
+```{r fortalezas debilidades, echo=FALSE, results='asis'}
+fort_deb <- matrix(c("*Simple y efectivo",
+              "* No hace asunciones acerca de la distribución subyacente de los datos",
+              "* Fase de entrenamiento rápida",
+              " ",
+              "* No produce un modelo, limitando la habilidad para entender cómo las características se relacionan con la clasificación",
+              "* Requiere seleccionar una _k_ adecuada",
+              "* Fase de clasificación lenta",
+              "* Se requiere procesado adicional para características nominales y datos incompletos"),
+              ncol=2)
+col_names <- c("Fortalezas", "Debilidades")
+kable(fort_deb, col.names = col_names)
+```
+
+
+# Adquisición de datos
+
+Las imágenes a clasificar deberán estar en una carpeta llamada "dataset", en el mismo directorio que el código que vamos a correr.
+
+```{r image to vector}
+library('OpenImageR')
+image_tovector <- function(x){
+# Create filepath
+filepath <- paste0("./dataset/effusion/", x)
+#print(filepath)
+# Read image
+image <- readImage(filepath)
+# Convert to greyscale
+image_grey <- rgb_2gray(image)
+# Resize to 64x64
+image_resized <- resizeImage(image_grey, 64, 64)
+# Transform from matrix to vector
+return(as.vector(image_resized))
+}
+
+## TODO ## Incluir en el informe ejemplos de imagenes antes y después del preprocesado (función imageShow()).
+
+```
+```{r}
+# Vector with names of files
+filenames <- list.files("./dataset/effusion")
+image_vectors <- lapply(head(filenames, n=6L), image_tovector)
+```
+
+
+
+```{r Descargar set de datos, eval=FALSE}
+source_url <- "https://github.com/stedy/Machine-Learning-with-R-datasets/raw/master/wisc_bc_data.csv"
+download.file(source_url, destfile = "./data/wisc_bc_data.csv")
+```
+
+
+## 2- Explorar y preparar los datos
+```{r read data as a data frame}
+wbcd <- read.csv("./data/wisc_bc_data.csv", stringsAsFactors = FALSE)
+```
+
+
+### Estructura de los datos
+```{r examine data structure}
+str(wbcd)
+```
+
+La variable _id_ es un número identificador único para cada observación. Los identificadores únicos son contraproducentes en los métodos de aprendizaje automático, así que procederemos a eliminarlo.
+```{r drop id variable}
+wbcd$id <- NULL
+```
+
+La variable _diagnosis_ se usará como diana, ya que es lo que querremos predecir. Si exploramos la variable con la función table():
+```{r}
+table(wbcd$diagnosis)
+```
+
+Muchos algoritmos de clasificación requieren que la característica diana esté codificada como factor, y eso es lo que haremos a continuación, también aprovechando para utilizar unas etiquetas más informativas:
+```{r recode diagnosis as factors}
+wbcd$diagnosis <- factor(wbcd$diagnosis, levels = c("B", "M"),
+                         labels = c("Benigno", "Maligno"))
+```
+
+Si examinamos las proporciones de cada diagnóstico:
+```{r}
+round(prop.table(table(wbcd$diagnosis))*100, digits = 1L)
+```
+
+```{r echo=FALSE}
+# Para el informe dinámico una cosa que se puede hacer es comparar automáticamente los rangos de las variables y hacer la normalización, o no, según los órdenes de magnitud de diferencia.
+```
+
+```{r}
+summary(wbcd[c("radius_mean", "area_mean", "smoothness_mean")])
+```
+
+## 3- Transformación de datos numéricos: normalización
+
+```{r define función de normalización}
+normalize <- function(x){
+  return ((x - min(x)) / (max(x) - min(x)))
+}
+```
+
+```{r normalize all the numeric variables in the dataframe}
+wbcd_n <- as.data.frame(lapply(wbcd[2:31], normalize))
+```
+
+```{r check if normalization worked}
+summary(wbcd_n$area_mean)
+```
+
+## Preparación de los datos - crear los dataset de entrenamiento y de test
+```{r}
+wbcd_train <- wbcd_n[1:469,]
+wbcd_test <- wbcd_n[470:569,]
+```
+
+```{r storing the dignosis labels}
+wbcd_train_labels <- wbcd[1:469, 1]
+wbcd_test_labels <- wbcd[470:569, 1]
+```
+
+### Step 3 - training a model on the data
+
+For the k-NN algorithm, the training phase involves no model building; the process of training a lazy learner involves storing the input data in a structured format.
+
+```{r classify the test data}
+library('class')
+
+wbcd_test_pred <- knn(train = wbcd_train, test = wbcd_test,
+                      cl = wbcd_train_labels, k=21)
+```
+
+### Step 4 - evaluating model performance
+
