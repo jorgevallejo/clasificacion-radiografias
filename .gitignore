@@ -5,4 +5,7 @@
 
 [images]
 dataset/
-./*.png
+/*.png
+
+[results]
+/*.RData

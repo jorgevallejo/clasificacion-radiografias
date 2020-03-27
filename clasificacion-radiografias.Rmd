@@ -62,6 +62,7 @@ Las imágenes a clasificar deberán estar en una carpeta llamada "dataset", en e
 
 ```{r image to vector}
 library('OpenImageR')
+
 image_tovector <- function(x){
 # Create filepath
 filepath <- paste0("./dataset/effusion/", x)
@@ -79,10 +80,46 @@ return(as.vector(image_resized))
 ## TODO ## Incluir en el informe ejemplos de imagenes antes y después del preprocesado (función imageShow()).
 
 ```
-```{r}
+
+```{r extract directories and filenames}
+directories <- list.dirs("./dataset", full.names = FALSE, recursive = FALSE)
+filenames <- as.data.frame(
+  sapply(directories,
+                    function (x){return(
+                      list.files(paste0("./dataset/", x)))}))
+
+# From wide to long format
+filenames <- reshape(filenames,
+                      direction="long",
+                      varying = c("effusion", "normal"),
+                      v.names="Filename",
+                      timevar="Condition",
+                      times = c("effusion", "normal")
+                      )
+row.names(filenames) <- NULL
+filenames$id <- NULL
+filenames$Condition <- as.factor(filenames$Condition)
+filenames$Filename <- as.character(filenames$Filename)
+```
+
+
+
+```{r create dataframe of vectorized images}
 # Vector with names of files
 filenames <- list.files("./dataset/effusion")
-image_vectors <- lapply(head(filenames, n=6L), image_tovector)
+
+# Matrix of vectorized images
+image_vectors <- sapply(filenames, image_tovector)
+# Transpose to have images as observations
+image_dataframe <- as.data.frame(t(image_vectors))
+
+## How to check if each row if really an x-ray image:
+# Extract one row of the dataframe and store as a numeric vector
+# test <- as.numeric(image_dataframe[1,])
+# Transform vector into matrix
+# test <- matrix(test, ncol=64)
+# Check if you obtain an x-ray image
+# imageShow(test)
 ```
 
 
