@@ -65,7 +65,7 @@ library('OpenImageR')
 
 image_tovector <- function(x){
 # Create filepath
-filepath <- paste0("./dataset/effusion/", x)
+filepath <- file.path("./dataset", x[,1], x[,2])
 #print(filepath)
 # Read image
 image <- readImage(filepath)
