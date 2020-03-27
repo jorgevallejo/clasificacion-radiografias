@@ -65,7 +65,8 @@ library('OpenImageR')
 
 image_tovector <- function(x){
 # Create filepath
-filepath <- file.path("./dataset", x[,1], x[,2])
+filepath <- paste("./dataset", sep='/',
+                  paste(as.vector(x), collapse = '/'))
 #print(filepath)
 # Read image
 image <- readImage(filepath)
@@ -98,28 +99,30 @@ filenames <- reshape(filenames,
                       )
 row.names(filenames) <- NULL
 filenames$id <- NULL
-filenames$Condition <- as.factor(filenames$Condition)
+#filenames$Condition <- as.factor(filenames$Condition)
 filenames$Filename <- as.character(filenames$Filename)
 ```
 
 
 
 ```{r create dataframe of vectorized images}
-# Vector with names of files
-filenames <- list.files("./dataset/effusion")
-
 # Matrix of vectorized images
-image_vectors <- sapply(filenames, image_tovector)
+image_vectors <- apply(filenames, 1, image_tovector)
+save(image_vectors, file = "image_vectors.RData")
 # Transpose to have images as observations
 image_dataframe <- as.data.frame(t(image_vectors))
+```
 
+```{r test images in rows, eval=FALSE}
 ## How to check if each row if really an x-ray image:
+test_row <- function(x){
 # Extract one row of the dataframe and store as a numeric vector
-# test <- as.numeric(image_dataframe[1,])
+ test <- as.numeric(image_dataframe[x,])
 # Transform vector into matrix
-# test <- matrix(test, ncol=64)
+ test <- matrix(test, ncol=64)
 # Check if you obtain an x-ray image
-# imageShow(test)
+ imageShow(test)
+}
 ```
 
 
