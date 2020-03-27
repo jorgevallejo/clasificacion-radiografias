@@ -103,27 +103,36 @@ filenames$id <- NULL
 filenames$Filename <- as.character(filenames$Filename)
 ```
 
-
-
 ```{r create dataframe of vectorized images}
 # Matrix of vectorized images
 image_vectors <- apply(filenames, 1, image_tovector)
+## TODO Keep the file names as col names
 save(image_vectors, file = "image_vectors.RData")
 # Transpose to have images as observations
-image_dataframe <- as.data.frame(t(image_vectors))
+image_vectors <- as.data.frame(t(image_vectors))
 ```
 
 ```{r test images in rows, eval=FALSE}
 ## How to check if each row if really an x-ray image:
 test_row <- function(x){
 # Extract one row of the dataframe and store as a numeric vector
- test <- as.numeric(image_dataframe[x,])
+ test <- as.numeric(image_vectors[x,])
 # Transform vector into matrix
  test <- matrix(test, ncol=64)
 # Check if you obtain an x-ray image
  imageShow(test)
 }
 ```
+
+```{r final dataframe with filenames and diagnostic}
+image_vectors <- cbind(filenames, image_dataframe)
+```
+
+
+
+
+
+
 
 
 
