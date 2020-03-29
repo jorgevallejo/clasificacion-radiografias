@@ -56,11 +56,14 @@ kable(fort_deb, col.names = col_names)
 ```
 
 
-# Adquisición de datos
+# Pre-procesado de datos
 
 Las imágenes a clasificar deberán estar en una carpeta llamada "dataset", en el mismo directorio que el código que vamos a correr.
+```{r set directories structure}
+dir.create("./results")
+```
 
-```{r image to vector}
+```{r function image to vector}
 library('OpenImageR')
 
 image_tovector <- function(x){
@@ -94,7 +97,7 @@ filenames <- reshape(filenames,
                       direction="long",
                       varying = c("effusion", "normal"),
                       v.names="Filename",
-                      timevar="Condition",
+                      timevar="cat",
                       times = c("effusion", "normal")
                       )
 row.names(filenames) <- NULL
@@ -107,7 +110,11 @@ filenames$Filename <- as.character(filenames$Filename)
 # Matrix of vectorized images
 image_vectors <- apply(filenames, 1, image_tovector)
 ## TODO Keep the file names as col names
+
+# This instructions to avoid re-calculating the object every time
+load("image_vectors.RData")
 save(image_vectors, file = "image_vectors.RData")
+
 # Transpose to have images as observations
 image_vectors <- as.data.frame(t(image_vectors))
 ```
@@ -125,33 +132,35 @@ test_row <- function(x){
 ```
 
 ```{r final dataframe with filenames and diagnostic}
-image_vectors <- cbind(filenames, image_dataframe)
+image_vectors <- cbind(filenames, image_vectors)
+# Change cat variable to factors
+image_vectors$cat <- as.factor(image_vectors$cat)
+levels(image_vectors$cat) <- c("e", "n")
 ```
 
-
-
-
-
-
-
-
-
-```{r Descargar set de datos, eval=FALSE}
-source_url <- "https://github.com/stedy/Machine-Learning-with-R-datasets/raw/master/wisc_bc_data.csv"
-download.file(source_url, destfile = "./data/wisc_bc_data.csv")
+```{r write the dataframe into a csv file}
+write.csv2(image_vectors,
+           file="./results/RX_Torax_4097.csv",
+           row.names = FALSE)
 ```
 
-
-## 2- Explorar y preparar los datos
-```{r read data as a data frame}
-wbcd <- read.csv("./data/wisc_bc_data.csv", stringsAsFactors = FALSE)
+### Lectura de datos
+```{r lectura del fichero csv}
+image_vectors <- read.csv2("./results/RX_Torax_4097.csv")
 ```
 
 
 ### Estructura de los datos
 ```{r examine data structure}
-str(wbcd)
+observaciones <- nrow(image_vectors)
+variables <- ncol(image_vectors)-2
+ 
 ```
+
+El set de datos examinado está compuesto por `r observaciones` observaciones, de las cuales se han tomado `r variables` variables, y están divididas en `r length(directories)` clases (`r directories`).
+
+
+
 
 La variable _id_ es un número identificador único para cada observación. Los identificadores únicos son contraproducentes en los métodos de aprendizaje automático, así que procederemos a eliminarlo.
 ```{r drop id variable}
