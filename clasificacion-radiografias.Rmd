@@ -157,55 +157,82 @@ variables <- ncol(image_vectors)-2
  
 ```
 
-El set de datos examinado está compuesto por `r observaciones` observaciones, de las cuales se han tomado `r variables` variables, y están divididas en `r length(directories)` clases (`r directories`).
+El set de datos examinado está compuesto por `r observaciones` observaciones, de las cuales se han tomado `r variables` variables, y están divididas en `r length(directories)` clases (`r directories`) that are codified as `r levels(image_vectors$cat)`.
 
-
-
-
-La variable _id_ es un número identificador único para cada observación. Los identificadores únicos son contraproducentes en los métodos de aprendizaje automático, así que procederemos a eliminarlo.
-```{r drop id variable}
-wbcd$id <- NULL
-```
-
-La variable _diagnosis_ se usará como diana, ya que es lo que querremos predecir. Si exploramos la variable con la función table():
-```{r}
-table(wbcd$diagnosis)
-```
-
-Muchos algoritmos de clasificación requieren que la característica diana esté codificada como factor, y eso es lo que haremos a continuación, también aprovechando para utilizar unas etiquetas más informativas:
-```{r recode diagnosis as factors}
-wbcd$diagnosis <- factor(wbcd$diagnosis, levels = c("B", "M"),
-                         labels = c("Benigno", "Maligno"))
-```
-
-Si examinamos las proporciones de cada diagnóstico:
-```{r}
-round(prop.table(table(wbcd$diagnosis))*100, digits = 1L)
-```
-
-```{r echo=FALSE}
-# Para el informe dinámico una cosa que se puede hacer es comparar automáticamente los rangos de las variables y hacer la normalización, o no, según los órdenes de magnitud de diferencia.
-```
+La distribución de cada clase es la siguiente:
 
 ```{r}
-summary(wbcd[c("radius_mean", "area_mean", "smoothness_mean")])
+kable(table(image_vectors$cat),
+      col.names = c("Clase", "Frecuencia"),
+      align = c('r','l'))
 ```
 
-## 3- Transformación de datos numéricos: normalización
+### Histograma de medias
 
-```{r define función de normalización}
-normalize <- function(x){
-  return ((x - min(x)) / (max(x) - min(x)))
-}
+```{r calcula la media de cada variable}
+image_vectors_normal <- image_vectors[image_vectors$cat == 'n',]
+image_vectors_effusion <- image_vectors[image_vectors$cat == 'e',]
+
+media_normal <- apply(image_vectors_normal[,3:ncol(image_vectors_normal)], 2, mean)
+media_effusion <- apply(image_vectors_effusion[,3:ncol(image_vectors_effusion)], 2, mean)
 ```
 
-```{r normalize all the numeric variables in the dataframe}
-wbcd_n <- as.data.frame(lapply(wbcd[2:31], normalize))
+
+```{r calcula la desviación típica de cada variable}
+sd_normal <- apply(image_vectors_normal[,3:ncol(image_vectors_normal)], 2, sd)
+sd_effusion <- apply(image_vectors_effusion[,3:ncol(image_vectors_effusion)], 2, sd)
 ```
 
-```{r check if normalization worked}
-summary(wbcd_n$area_mean)
+```{r max histogramas media}
+# Para calcular los rangos de las frecuencias
+hmn <- hist(media_normal)
+hme <- hist(media_effusion)
+max_y <- ceiling(max(c(hmn$counts, hme$counts))/100)*100
 ```
+```{r histogramas media}
+par(mfrow= c(1,2))
+hist(media_normal,
+     main="Valor medio de las variables\nClase normal",
+     ylab = "Frecuencia",
+     xlab = "Media",
+     xlim = c(0,1),
+     ylim = c(0, max_y))
+
+hist(media_effusion,
+     main="Valor medio de las variables\nClase effusion",
+     ylab = "Frecuencia",
+     xlab = "Media",
+     xlim = c(0,1),
+     ylim = c(0, max_y))
+```
+
+Los valores medios de las variables en la clase "normal" parecen estar más concentrados en el centro de la distribución, mientras que en la clase "effusion" la distribución es más achatada. Esto podría significar que las imágenes de la clase "effusion" presentan áreas más claras y más oscuras que las imágnes de la clase "normal".
+
+```{r max histogramas desviación típica}
+# Para calcular los rangos de las frecuencias
+hsn <- hist(sd_normal)
+hse <- hist(sd_effusion)
+max_ye <- ceiling(max(c(hsn$counts, hse$counts))/100)*100
+max_xe <- max(c(sd_effusion, sd_normal))
+```
+```{r histogramas desviación típica}
+par(mfrow= c(1,2))
+hist(sd_normal,
+     main="Desviación típica de las variables\nClase normal",
+     ylab = "Frecuencia",
+     xlab = "Media",
+     xlim = c(0,max_xe),
+     ylim = c(0, max_ye))
+
+hist(sd_effusion,
+     main="Desviación típica de las variables\nClase effusion",
+     ylab = "Frecuencia",
+     xlab = "Desviación típica",
+     xlim = c(0,max_xe),
+     ylim = c(0, max_ye))
+```
+
+Por la forma de los histogramas, y los rangos de valores en los que se mueven, parece que las variales en las observaciones de clase "effusion" presentan valores de desviación típica mayores que las variables en la clase "normal".
 
 ## Preparación de los datos - crear los dataset de entrenamiento y de test
 ```{r}
