@@ -259,6 +259,8 @@ xtable(ordered_p_values[1:25,-c(1,2)],
        display=c("s", "e", "fg"))
 ```
 
+Me llama la atención que en estos descriptores estadísticamente más significativos, la diferencia entre las medias del grupo "derrame"" y del grupo "normal" es de alrededor del 20%.
+
 
 ## TODO: Normalizar los p-valores ajustados, asociarlos a una escala de color y reconstruir la imagen para saber qué zonas de la imagen son más informativas.
 
