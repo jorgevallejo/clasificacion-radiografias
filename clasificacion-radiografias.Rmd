@@ -234,6 +234,39 @@ hist(sd_effusion,
 
 Por la forma de los histogramas, y los rangos de valores en los que se mueven, parece que las variales en las observaciones de clase "effusion" presentan valores de desviación típica mayores que las variables en la clase "normal".
 
+
+## Contraste de valores medios (t-test)
+
+```{r test t}
+# Código adaptado de
+# https://stackoverflow.com/questions/13790611/apply-t-test-on-many-columns-in-a-dataframe-split-by-factor
+variables_t_test <- t(sapply(image_vectors[c(-1,-2)], function(x)
+  unlist(t.test(x~image_vectors$cat)[c("estimate", "p.value")])))
+```
+
+```{r ajustar p-valores por correccion de Benjamini & Hochberg (BH)}
+variables_t_test_adjusted <- as.data.frame(variables_t_test)
+variables_t_test_adjusted[,3] <- p.adjust(variables_t_test_adjusted[,3])
+# Ordenar los valores de menor a mayor
+ordered_p_values <- variables_t_test_adjusted[order(variables_t_test[,3]),]
+# Añadir columna con diferencia de medias
+ordered_p_values[, "diferencia"] <- ordered_p_values[,1] - ordered_p_values[,2]
+# Preparar para mostrar como tabla
+library(xtable)
+xtable(ordered_p_values[1:25,-c(1,2)],
+       caption = "Tabla con los 25 descriptores de menor p-valor",
+       digits = 4,
+       display=c("s", "e", "fg"))
+```
+
+
+## TODO: Normalizar los p-valores ajustados, asociarlos a una escala de color y reconstruir la imagen para saber qué zonas de la imagen son más informativas.
+
+
+
+
+
+
 ## Preparación de los datos - crear los dataset de entrenamiento y de test
 ```{r}
 wbcd_train <- wbcd_n[1:469,]
