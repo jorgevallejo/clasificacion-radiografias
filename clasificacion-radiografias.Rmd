@@ -13,7 +13,7 @@ output:
 knit: (function(inputFile, encoding) {
   rmarkdown::render(inputFile, encoding = encoding,
   output_format = "all") })
-bibliography: scholar.bib
+
 ---
 
 ```{r setup, include=FALSE}
@@ -112,8 +112,8 @@ image_vectors <- apply(filenames, 1, image_tovector)
 ## TODO Keep the file names as col names
 
 # This instructions to avoid re-calculating the object every time
-load("image_vectors.RData")
-save(image_vectors, file = "image_vectors.RData")
+#load("image_vectors.RData")
+#save(image_vectors, file = "image_vectors.RData")
 
 # Transpose to have images as observations
 image_vectors <- as.data.frame(t(image_vectors))
@@ -285,15 +285,57 @@ image_vectors_train_labels <- image_vectors_training[, 1]
 image_vectors_test_labels <- image_vectors_test[, 1]
 ```
 
-
-```{r classify the test data}
+## Evalúa diferentes valores de k
+```{r classify the test data and evaluate different k values}
 library('class')
+library('gmodels')
 
-image_vectors_test_pred <- knn(train = image_vectors_training,
+k <- c(3, 5, 7, 11, 23, 45, 67)
+
+evaluator <- function (x){
+  image_vectors_test_pred <- knn(train = image_vectors_training,
                                test = image_vectors_test,
                                cl = image_vectors_train_labels, 
-                               k=3)
+                               k=x)
+  Results_table <- prop.table(
+    table(image_vectors_test_labels,
+          image_vectors_test_pred))
+  return(c(x, Results_table[3], Results_table[2]))
+}
+
+
+evaluated_k <- sapply(k, evaluator)
+
+# Save results as .RData file
+#save(evaluated_k, file="./results/evaluated_k.RData")
+# Load when necessary
+#load("./results/evaluated_k.RData")
+
+# Format results as a data frame
+dtevaluated_k <- as.data.frame(t(evaluated_k))
+# Add column for total errors of classifying
+dtevaluated_k[,4] <- (dtevaluated_k[,2] + dtevaluated_k[,3])
+# Add column names
+colnames(dtevaluated_k) <- c("k","False Negatives", "False Positives", "Total Error")
+# Format as percentages
+dtevaluated_k[,2:4] <- round(dtevaluated_k[,2:4], 2)*100
+dtevaluated_k[,2:4] <- mapply(paste0, dtevaluated_k[,2:4], "%")
+
+# Print table
+knitr::kable(dtevaluated_k,
+             align = c("c","c","c","c"))
 ```
 
-### Step 4 - evaluating model performance
+
+
+
+
+
+
+
+
+
+
+
+
 
