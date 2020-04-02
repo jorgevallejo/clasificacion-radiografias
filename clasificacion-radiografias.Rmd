@@ -280,9 +280,23 @@ wbcd_train_labels <- wbcd[1:469, 1]
 wbcd_test_labels <- wbcd[470:569, 1]
 ```
 
-### Step 3 - training a model on the data
 
-For the k-NN algorithm, the training phase involves no model building; the process of training a lazy learner involves storing the input data in a structured format.
+
+## Implementación del algoritmo knn
+
+Dividimos el set de datos, al azar, en un set de entrenamiento (67% de las observaciones) y un set de prueba (33% de los datos).
+
+```{r separa sets entrenamiento y prueba}
+set.seed(123)
+# Reordered row numbers
+observaciones <- nrow(image_vectors)
+shuffled_rows <- sample(observaciones)
+training_rows <- observaciones*0.67
+image_vectors_training <- image_vectors[1:training_rows,]
+image_vectors_test <- image_vectors[(training_rows+1):observaciones, ]
+```
+
+
 
 ```{r classify the test data}
 library('class')
