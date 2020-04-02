@@ -265,23 +265,6 @@ Me llama la atención que en estos descriptores estadísticamente más significa
 ## TODO: Normalizar los p-valores ajustados, asociarlos a una escala de color y reconstruir la imagen para saber qué zonas de la imagen son más informativas.
 
 
-
-
-
-
-## Preparación de los datos - crear los dataset de entrenamiento y de test
-```{r}
-wbcd_train <- wbcd_n[1:469,]
-wbcd_test <- wbcd_n[470:569,]
-```
-
-```{r storing the dignosis labels}
-wbcd_train_labels <- wbcd[1:469, 1]
-wbcd_test_labels <- wbcd[470:569, 1]
-```
-
-
-
 ## Implementación del algoritmo knn
 
 Dividimos el set de datos, al azar, en un set de entrenamiento (67% de las observaciones) y un set de prueba (33% de los datos).
@@ -293,8 +276,9 @@ observaciones <- nrow(image_vectors)
 shuffled_rows <- sample(observaciones)
 training_rows <- shuffled_rows[1:(observaciones*0.67)]
 test_rows <- shuffled_rows[((observaciones*0.67)+1):observaciones]
-image_vectors_training <- image_vectors[training_rows,]
-image_vectors_test <- image_vectors[test_rows, ]
+# Remember to use only numeric variables
+image_vectors_training <- image_vectors[training_rows, 3:ncol(image_vectors)]
+image_vectors_test <- image_vectors[test_rows, 3:ncol(image_vectors)]
 
 # Category labels
 image_vectors_train_labels <- image_vectors_training[, 1]
@@ -302,12 +286,13 @@ image_vectors_test_labels <- image_vectors_test[, 1]
 ```
 
 
-
 ```{r classify the test data}
 library('class')
 
-wbcd_test_pred <- knn(train = wbcd_train, test = wbcd_test,
-                      cl = wbcd_train_labels, k=21)
+image_vectors_test_pred <- knn(train = image_vectors_training,
+                               test = image_vectors_test,
+                               cl = image_vectors_train_labels, 
+                               k=3)
 ```
 
 ### Step 4 - evaluating model performance
