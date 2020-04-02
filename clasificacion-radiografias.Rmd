@@ -291,9 +291,14 @@ set.seed(123)
 # Reordered row numbers
 observaciones <- nrow(image_vectors)
 shuffled_rows <- sample(observaciones)
-training_rows <- observaciones*0.67
-image_vectors_training <- image_vectors[1:training_rows,]
-image_vectors_test <- image_vectors[(training_rows+1):observaciones, ]
+training_rows <- shuffled_rows[1:(observaciones*0.67)]
+test_rows <- shuffled_rows[((observaciones*0.67)+1):observaciones]
+image_vectors_training <- image_vectors[training_rows,]
+image_vectors_test <- image_vectors[test_rows, ]
+
+# Category labels
+image_vectors_train_labels <- image_vectors_training[, 1]
+image_vectors_test_labels <- image_vectors_test[, 1]
 ```
 
 
