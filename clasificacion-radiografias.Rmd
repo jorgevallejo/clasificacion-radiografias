@@ -20,6 +20,12 @@ knit: (function(inputFile, encoding) {
 # knitr options
 knitr::opts_chunk$set(echo = TRUE)
 
+# This is a try:
+knitr::opts_knit$set(stop_on_error = 2L)
+# See ?evaluate::evaluate
+# What I am trying to do is to make knitr stop
+# when an error is found instead of running the
+# complete script.
 ```
 
 ```{r libraries, include=FALSE}
@@ -60,7 +66,17 @@ kable(fort_deb, col.names = col_names)
 
 Las imágenes a clasificar deberán estar en una carpeta llamada "dataset", en el mismo directorio que el código que vamos a correr.
 ```{r set directories structure}
-dir.create("./results")
+dir.create("./results", showWarnings = FALSE)
+
+if (! dir.exists("./dataset")) {
+  stop("El directorio ./dataset no existe")
+}
+
+# DONE Si datasets existe
+#    si contiene datos
+#        Continúa con el script
+#    else: Aviso (La carpeta datasets no contiene datos)
+# DONE Else: la carpeta datasets no existe
 ```
 
 ```{r function image to vector}
@@ -112,6 +128,13 @@ image_vectors <- apply(filenames, 1, image_tovector)
 ## TODO Keep the file names as col names
 
 # This instructions to avoid re-calculating the object every time
+
+# IF the file exists
+#     load the file
+# ELSE
+#    calculate the matrix
+#    save the matrix
+
 #load("image_vectors.RData")
 #save(image_vectors, file = "image_vectors.RData")
 
