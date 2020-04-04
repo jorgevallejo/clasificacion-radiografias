@@ -355,7 +355,7 @@ dtevaluated_k[,4] <- (dtevaluated_k[,2] + dtevaluated_k[,3])
 # Add column names
 colnames(dtevaluated_k) <- c("k","False Negatives", "False Positives", "Total Error")
 # Format as percentages
-dtevaluated_k[,2:4] <- round(dtevaluated_k[,2:4], 2)*100
+dtevaluated_k[,2:4] <- round(dtevaluated_k[,2:4], 3)*100
 dtevaluated_k[,2:4] <- mapply(paste0, dtevaluated_k[,2:4], "%")
 
 # Print table
