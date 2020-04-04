@@ -334,13 +334,19 @@ evaluator <- function (x){
   return(c(x, Results_table[3], Results_table[2]))
 }
 
+#Check if the file already exists
+if(file.exists("./results/evaluated_k.RData")){
+  load("./results/evaluated_k.RData")
+}else{
+# Evaluate the different k values
+  evaluated_k <- sapply(k, evaluator)
+  save(evaluated_k, file="./results/evaluated_k.RData")
+}
+# This if-else block is to avoid re-calculating 
+# the object every time I want to try the code.
+# I have just have care to remove the .RData file
+# if I want to re-calculate it.
 
-evaluated_k <- sapply(k, evaluator)
-
-# Save results as .RData file
-#save(evaluated_k, file="./results/evaluated_k.RData")
-# Load when necessary
-#load("./results/evaluated_k.RData")
 
 # Format results as a data frame
 dtevaluated_k <- as.data.frame(t(evaluated_k))
