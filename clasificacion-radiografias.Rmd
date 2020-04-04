@@ -187,7 +187,7 @@ variables <- ncol(image_vectors)-2
  
 ```
 
-El set de datos examinado está compuesto por `r observaciones` observaciones, de las cuales se han tomado `r variables` variables, y están divididas en `r length(directories)` clases (`r directories`) that are codified as `r levels(image_vectors$cat)`.
+El set de datos examinado está compuesto por `r observaciones` observaciones, de las cuales se han tomado `r variables` variables, y están divididas en `r length(directories)` clases (`r directories`) codificadas como `r levels(image_vectors$cat)`.
 
 La distribución de cada clase es la siguiente:
 
@@ -246,7 +246,7 @@ max_ye <- ceiling(max(c(hsn$counts, hse$counts))/100)*100
 max_xe <- max(c(sd_effusion, sd_normal))
 ```
 
-```{r histogramas desviación típica}
+```{r histogramas desviacion tipica}
 par(mfrow= c(1,2))
 hist(sd_normal,
      main="Desviación típica de las variables\nClase normal",
