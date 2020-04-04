@@ -238,13 +238,14 @@ hist(media_effusion,
 
 Los valores medios de las variables en la clase "normal" parecen estar más concentrados en el centro de la distribución, mientras que en la clase "effusion" la distribución es más achatada. Esto podría significar que las imágenes de la clase "effusion" presentan áreas más claras y más oscuras que las imágenes de la clase "normal".
 
-```{r max histogramas desviación típica}
+```{r max histogramas desviación típica, include=FALSE}
 # Para calcular los rangos de las frecuencias
 hsn <- hist(sd_normal)
 hse <- hist(sd_effusion)
 max_ye <- ceiling(max(c(hsn$counts, hse$counts))/100)*100
 max_xe <- max(c(sd_effusion, sd_normal))
 ```
+
 ```{r histogramas desviación típica}
 par(mfrow= c(1,2))
 hist(sd_normal,
