@@ -163,9 +163,15 @@ levels(image_vectors$cat) <- c("e", "n")
 ```
 
 ```{r write the dataframe into a csv file}
-write.csv2(image_vectors,
+if( ! file.exists("./results/RX_Torax_4097.csv")){
+  write.csv2(image_vectors,
            file="./results/RX_Torax_4097.csv",
            row.names = FALSE)
+}
+
+# Structured in that way to avoid writing the file
+# each time that I want to test the script,
+# especially if I just want to test knitting
 ```
 
 ### Lectura de datos
