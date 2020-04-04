@@ -123,20 +123,21 @@ filenames$Filename <- as.character(filenames$Filename)
 ```
 
 ```{r create dataframe of vectorized images}
+
+#Check if the file already exists
+if(file.exists("image_vectors.RData")){
+  load("image_vectors.RData")
+}else{
 # Matrix of vectorized images
 image_vectors <- apply(filenames, 1, image_tovector)
+save(image_vectors, file = "image_vectors.RData")
+}
+# This if-else block is to avoid re-calculating 
+# the object every time I want to try the code.
+# I have just have care to remove the .RData file
+# if I want to re-calculate it.
+
 ## TODO Keep the file names as col names
-
-# This instructions to avoid re-calculating the object every time
-
-# IF the file exists
-#     load the file
-# ELSE
-#    calculate the matrix
-#    save the matrix
-
-#load("image_vectors.RData")
-#save(image_vectors, file = "image_vectors.RData")
 
 # Transpose to have images as observations
 image_vectors <- as.data.frame(t(image_vectors))
