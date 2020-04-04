@@ -207,18 +207,18 @@ media_normal <- apply(image_vectors_normal[,3:ncol(image_vectors_normal)], 2, me
 media_effusion <- apply(image_vectors_effusion[,3:ncol(image_vectors_effusion)], 2, mean)
 ```
 
-
 ```{r calcula la desviación típica de cada variable}
 sd_normal <- apply(image_vectors_normal[,3:ncol(image_vectors_normal)], 2, sd)
 sd_effusion <- apply(image_vectors_effusion[,3:ncol(image_vectors_effusion)], 2, sd)
 ```
 
-```{r max histogramas media}
+```{r max histogramas media, include=FALSE}
 # Para calcular los rangos de las frecuencias
 hmn <- hist(media_normal)
 hme <- hist(media_effusion)
 max_y <- ceiling(max(c(hmn$counts, hme$counts))/100)*100
 ```
+
 ```{r histogramas media}
 par(mfrow= c(1,2))
 hist(media_normal,
@@ -236,7 +236,7 @@ hist(media_effusion,
      ylim = c(0, max_y))
 ```
 
-Los valores medios de las variables en la clase "normal" parecen estar más concentrados en el centro de la distribución, mientras que en la clase "effusion" la distribución es más achatada. Esto podría significar que las imágenes de la clase "effusion" presentan áreas más claras y más oscuras que las imágnes de la clase "normal".
+Los valores medios de las variables en la clase "normal" parecen estar más concentrados en el centro de la distribución, mientras que en la clase "effusion" la distribución es más achatada. Esto podría significar que las imágenes de la clase "effusion" presentan áreas más claras y más oscuras que las imágenes de la clase "normal".
 
 ```{r max histogramas desviación típica}
 # Para calcular los rangos de las frecuencias
