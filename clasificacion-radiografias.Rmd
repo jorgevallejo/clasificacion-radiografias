@@ -36,8 +36,6 @@ knitr::opts_knit$set(stop_on_error = 2L)
 library(knitr)
 ```
 
-# Índice
-
 # Algoritmo k-NN
 
 El algoritmo de los k vecinos más próximos (_k-nearest neighbours_) es un algoritmo de aprendizaje automático (_machine learning_) que se utiliza para clasificar observaciones, según si sus características las hacen más parecidas a uno u otro grupo ya establecidos.  
@@ -363,7 +361,7 @@ knitr::kable(dtevaluated_k,
              align = c("c","c","c","c"))
 ```
 
-
+Si priorizamos los falsos negativos, que son lo que potencialmente suponen un mayor perjuicio para el paciente, el k más adecuado sería`r evaluated_k[1, (which.min(evaluated_k[2,]))]`; que nos proporciona un valor del `r noquote(paste0(evaluated_k[2, (which.min(evaluated_k[2,]))], "%"))` de falsos positivos.
 
 
 
