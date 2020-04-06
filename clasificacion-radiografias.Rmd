@@ -363,6 +363,26 @@ knitr::kable(dtevaluated_k,
 
 Si priorizamos los falsos negativos, que son lo que potencialmente suponen un mayor perjuicio para el paciente, el k más adecuado sería`r evaluated_k[1, (which.min(evaluated_k[2,]))]`; que nos proporciona un valor del `r noquote(paste0(evaluated_k[2, (which.min(evaluated_k[2,]))], "%"))` de falsos positivos.
 
+## Análisis de rendimiento. Curvas ROC y AUC
+
+Las curvas ROC (Receiver Operating Characteristic) son un método de análisis de rendimiento que se usa para determinar el punto de equilibrio entre la capacidad de detectar positivos auténticos, y la de evitar falsos positivos.
+
+Un clasificador perfecto detectaría todos los positivos antes de detectar ningún falso negativo. Una forma de medir cuánto se acerca el rendimiento de nuestro clasificador al del clasificador perfecto es mediante el estadístico AUC (area under the ROC curve).
+
+```{r create ROC curve}
+library(ROCR)
+
+# Necesitaremos los valores reales:
+# image_vectors_test_labels
+# Y los valores predichos:
+# image_vectors_test_pred (producidos dentro de la función evaluator())
+
+image_vectors_test_pred <- knn(train = image_vectors_training,
+                               test = image_vectors_test,
+                               cl = image_vectors_train_labels, 
+                               k=3)
+
+```
 
 
 
