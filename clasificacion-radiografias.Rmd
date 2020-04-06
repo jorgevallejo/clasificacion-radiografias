@@ -423,9 +423,9 @@ if(file.exists("./results/prob_pred.RData")){
 }
 
 # Create the prediction object
-prediction_object <- prediction(predictions = prob_pred,
-                                labels = image_vectors_test_labels,
-                                label.ordering = c("n", "e"))
+#prediction_object <- prediction(predictions = prob_pred,
+#                                labels = image_vectors_test_labels,
+#                                label.ordering = c("n", "e"))
 
 prediction_objects <- apply(prob_pred, 2, prediction,
                             labels = image_vectors_test_labels,
