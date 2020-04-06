@@ -28,6 +28,22 @@ knitr::opts_knit$set(stop_on_error = 2L)
 # complete script.
 ```
 
+```{r delete results files, eval= FALSE}
+# Run this chunk ONLY if you want to re-do
+# all the report FROM ZERO.
+# Remember that the .RData files are there to
+# avoid unnecesarily redoing long data processing.
+
+file.remove(c("clasificacion-radiografias.html",
+              "clasificacion-radiografias.pdf",
+              "./results/evaluated_k.RData",
+              "./results/prob_pred.RData",
+              "./results/RX_Torax_4097.csv"))
+
+
+```
+
+
 ```{r libraries, include=FALSE}
 # Install packages
 # Load packages
@@ -45,7 +61,7 @@ En una primera fase de 'entrenamiento', una colección de observaciones ya clasi
 
 ## Fortalezas y debilidades del algoritmo
 
-```{r fortalezas debilidades, echo=FALSE, results='asis'}
+```{r fortalezas debilidades, message=FALSE, results='asis'}
 fort_deb <- matrix(c("*Simple y efectivo",
               "* No hace asunciones acerca de la distribución subyacente de los datos",
               "* Fase de entrenamiento rápida",
@@ -123,12 +139,12 @@ filenames$Filename <- as.character(filenames$Filename)
 ```{r create dataframe of vectorized images}
 
 #Check if the file already exists
-if(file.exists("image_vectors.RData")){
-  load("image_vectors.RData")
+if(file.exists("./results/image_vectors.RData")){
+  load("./results/image_vectors.RData")
 }else{
 # Matrix of vectorized images
 image_vectors <- apply(filenames, 1, image_tovector)
-save(image_vectors, file = "image_vectors.RData")
+save(image_vectors, file = "./results/image_vectors.RData")
 }
 # This if-else block is to avoid re-calculating 
 # the object every time I want to try the code.
@@ -407,9 +423,9 @@ if(file.exists("./results/prob_pred.RData")){
 }
 
 # Create the prediction object
-prediction_object <- prediction(predictions = prob_pred,
-                                labels = image_vectors_test_labels,
-                                label.ordering = c("n", "e"))
+#prediction_object <- prediction(predictions = prob_pred,
+#                                labels = image_vectors_test_labels,
+#                                label.ordering = c("n", "e"))
 
 prediction_objects <- apply(prob_pred, 2, prediction,
                             labels = image_vectors_test_labels,
