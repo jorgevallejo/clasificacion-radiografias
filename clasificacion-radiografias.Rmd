@@ -310,8 +310,8 @@ image_vectors_training <- image_vectors[training_rows, 3:ncol(image_vectors)]
 image_vectors_test <- image_vectors[test_rows, 3:ncol(image_vectors)]
 
 # Category labels
-image_vectors_train_labels <- image_vectors_training[, 1]
-image_vectors_test_labels <- image_vectors_test[, 1]
+image_vectors_train_labels <- image_vectors[training_rows, 1]
+image_vectors_test_labels <- image_vectors[test_rows, 1]
 ```
 
 ## Evalúa diferentes valores de k
@@ -380,7 +380,21 @@ library(ROCR)
 image_vectors_test_pred <- knn(train = image_vectors_training,
                                test = image_vectors_test,
                                cl = image_vectors_train_labels, 
-                               k=3)
+                               k=3,
+                               prob = TRUE)
+
+# Probabilidad de la clase predicha
+prob_pred <- attr(image_vectors_test_pred, "prob")
+
+
+# Probabilidad de la clase positiva ("effusion")
+for (i in 1:length(image_vectors_test_pred)){
+    if(image_vectors_test_pred[i]=="n"){
+      prob_pred[i]<- 1-prob_pred[i]
+    }
+  }
+  
+## TODO: Refactorizar la funcion evaluator para no calcular esto dos veces.
 
 ```
 
