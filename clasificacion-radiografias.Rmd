@@ -28,6 +28,22 @@ knitr::opts_knit$set(stop_on_error = 2L)
 # complete script.
 ```
 
+```{r delete results files, eval= FALSE}
+# Run this chunk ONLY if you want to re-do
+# all the report FROM ZERO.
+# Remember that the .RData files are there to
+# avoid unnecesarily redoing long data processing.
+
+file.remove(c("clasificacion-radiografias.html",
+              "clasificacion-radiografias.pdf",
+              "./results/evaluated_k.RData",
+              "./results/prob_pred.RData",
+              "./results/RX_Torax_4097.csv"))
+
+
+```
+
+
 ```{r libraries, include=FALSE}
 # Install packages
 # Load packages
