@@ -376,11 +376,11 @@ library(ROCR)
 # image_vectors_test_labels
 # Y los valores predichos:
 # image_vectors_test_pred (producidos dentro de la función evaluator())
-
+prob_pred_ <- function(x){
 image_vectors_test_pred <- knn(train = image_vectors_training,
                                test = image_vectors_test,
                                cl = image_vectors_train_labels, 
-                               k=3,
+                               k=x,
                                prob = TRUE)
 
 # Probabilidad de la clase predicha
@@ -392,11 +392,61 @@ for (i in 1:length(image_vectors_test_pred)){
     if(image_vectors_test_pred[i]=="n"){
       prob_pred[i]<- 1-prob_pred[i]
     }
-  }
-  
-## TODO: Refactorizar la funcion evaluator para no calcular esto dos veces.
+}
+return(prob_pred)
+}
+## TODO: Refactorizar la funcion evaluator para no calcular image_vectors_test_pred dos veces.
 
+#Check if the file already exists
+if(file.exists("./results/prob_pred.RData")){
+  load("./results/prob_pred.RData")
+}else{
+# Calculate de probabilities of predicted positive class
+  prob_pred <- sapply(k, prob_pred_)
+  save(prob_pred, file="./results/prob_pred.RData")
+}
+
+# Create the prediction object
+prediction_object <- prediction(predictions = prob_pred,
+                                labels = image_vectors_test_labels,
+                                label.ordering = c("n", "e"))
+
+prediction_objects <- apply(prob_pred, 2, prediction,
+                            labels = image_vectors_test_labels,
+                            label.ordering = c("n", "e"))
+# Create performance object
+#performance_object <- performance(prediction_object,
+#                                  measure = "tpr",
+#                                  x.measure = "fpr")
+
+performance_objects <- lapply(prediction_objects,
+                              performance,
+                              measure = "tpr",
+                              x.measure = "fpr")
+
+# Calculate AUC
+#perf.auc <- performance(prediction_object, measure = "auc")
+perf.aucs <- lapply(prediction_objects,
+                    performance,
+                    measure="auc")
+
+#auc_value <- unlist(perf.auc@y.values)
+auc_values <- lapply(perf.aucs, function (x) unlist(x@y.values))
 ```
+
+```{r draw ROC curve, fig.height = 20, fig.width = 8}
+# Draw ROC curve
+par(mfrow=c(4,2))
+for(i in 1:length(performance_objects)){
+plot(performance_objects[[i]],
+     main="Curva ROC",
+     col = "blue", lwd=3)
+abline(a = 0, b = 1, lwd = 2, lty = 2)
+text(0.1, y = 0.9, labels = paste0("AUC: ", round(auc_values[[i]], digits = 2)))
+}
+```
+
+
 
 
 
