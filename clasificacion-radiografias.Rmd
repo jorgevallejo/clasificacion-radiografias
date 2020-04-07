@@ -476,7 +476,10 @@ El valor k para el error total mínimo (`r noquote(paste0(evaluated_k[3, (which.
 Dado que el error potencialmente más perjudicial para el paciente son los falsos negativos, deberíamos elegir el valor de k = `r evaluated_k[1, (which.min(evaluated_k[2,]))]`. Este resulta en un falso negativo del `r noquote(paste0(evaluated_k[2, (which.min(evaluated_k[2,]))], "%"))`, falso positivo del `r noquote(paste0(evaluated_k[3, (which.min(evaluated_k[2,]))], "%"))` y AUC de `r round(unlist((auc_values[which.min(evaluated_k[2,]])), digits = 2)`.
 
 
-
+\newpage
+```{r session_info, include=TRUE, echo=TRUE, results='markup'}
+sessionInfo() # For better reproducibility
+```
 
 
 
