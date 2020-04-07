@@ -12,7 +12,8 @@ output:
 # Next code for knitting both types of documents automatically comes from https://stackoverflow.com/questions/39662365/knit-one-markdown-file-to-two-output-files/53280491#53280491
 knit: (function(inputFile, encoding) {
   rmarkdown::render(inputFile, encoding = encoding,
-  output_format = "all") })
+  output_format = "all",
+  output_dir = "results") })
 
 ---
 
@@ -306,9 +307,9 @@ xtable(ordered_p_values[1:25,-c(1,2)],
 
 Me llama la atención que en estos descriptores estadísticamente más significativos, la diferencia entre las medias del grupo "derrame"" y del grupo "normal" es de alrededor del 20%.
 
-
+```{r}
 ## TODO: Normalizar los p-valores ajustados, asociarlos a una escala de color y reconstruir la imagen para saber qué zonas de la imagen son más informativas.
-
+```
 
 ## Implementación del algoritmo knn
 
@@ -367,7 +368,7 @@ dtevaluated_k <- as.data.frame(t(evaluated_k))
 # Add column for total errors of classifying
 dtevaluated_k[,4] <- (dtevaluated_k[,2] + dtevaluated_k[,3])
 # Add column names
-colnames(dtevaluated_k) <- c("k","False Negatives", "False Positives", "Total Error")
+colnames(dtevaluated_k) <- c("k","Falsos Negativos", "Falsos Positivos", "Error Total")
 # Format as percentages
 dtevaluated_k[,2:4] <- round(dtevaluated_k[,2:4], 3)*100
 dtevaluated_k[,2:4] <- mapply(paste0, dtevaluated_k[,2:4], "%")
@@ -384,6 +385,8 @@ Si priorizamos los falsos negativos, que son lo que potencialmente suponen un ma
 Las curvas ROC (Receiver Operating Characteristic) son un método de análisis de rendimiento que se usa para determinar el punto de equilibrio entre la capacidad de detectar positivos auténticos, y la de evitar falsos positivos.
 
 Un clasificador perfecto detectaría todos los positivos antes de detectar ningún falso negativo. Una forma de medir cuánto se acerca el rendimiento de nuestro clasificador al del clasificador perfecto es mediante el estadístico AUC (area under the ROC curve).
+
+En los siguientes gráficos están representadas tanto las curvas ROC como los valores AUC para cada valor de k:
 
 ```{r create ROC curve}
 library(ROCR)
@@ -473,7 +476,7 @@ El valor k para el mínimo de falsos positivos (`r noquote(paste0(evaluated_k[3,
 
 El valor k para el error total mínimo (`r noquote(paste0(evaluated_k[3, (which.min(apply(evaluated_k[2:3,], 2, sum)))], "%"))`) es `r evaluated_k[1, (which.min(apply(evaluated_k[2:3,], 2, sum)))]`.
 
-Dado que el error potencialmente más perjudicial para el paciente son los falsos negativos, deberíamos elegir el valor de k = `r evaluated_k[1, (which.min(evaluated_k[2,]))]`. Este resulta en un falso negativo del `r noquote(paste0(evaluated_k[2, (which.min(evaluated_k[2,]))], "%"))`, falso positivo del `r noquote(paste0(evaluated_k[3, (which.min(evaluated_k[2,]))], "%"))` y AUC de `r round(unlist((auc_values[which.min(evaluated_k[2,]])), digits = 2)`.
+Dado que el error potencialmente más perjudicial para el paciente son los falsos negativos, deberíamos elegir el valor de k = `r evaluated_k[1, (which.min(evaluated_k[2,]))]`. Este resulta en un falso negativo del `r noquote(paste0(evaluated_k[2, (which.min(evaluated_k[2,]))], "%"))`, falso positivo del `r noquote(paste0(evaluated_k[3, (which.min(evaluated_k[2,]))], "%"))` y AUC de `r round(unlist((auc_values[which.min(evaluated_k[2,])])), digits = 2)`.
 
 
 \newpage
