@@ -455,14 +455,22 @@ auc_values <- lapply(perf.aucs, function (x) unlist(x@y.values))
 par(mfrow=c(4,2))
 for(i in 1:length(performance_objects)){
 plot(performance_objects[[i]],
-     main="Curva ROC",
+     main=paste0("Curva ROC para k = ",k[i]),
      col = "blue", lwd=3)
 abline(a = 0, b = 1, lwd = 2, lty = 2)
 text(0.1, y = 0.9, labels = paste0("AUC: ", round(auc_values[[i]], digits = 2)))
 }
 ```
 
+Una vez calculadas las curvas ROC y los valores de AUC, podemos ver que el mayor AUC (###valorAUCmáximo###) corresponde al valor de k (###índicedelvalorAUCmáximo###).
 
+El valor k para el mínimo de falsos positivos corresponde a ###
+
+El valor k para el mínimo de falsos negativos corresponde a ###
+
+El valor k para el error total mínimo es ###
+
+Dado que el error potencialmente más perjudicial para el paciente son los falsos negativos, deberíamos elegir el valor de k ###. Este resulta en un falso negativo del ###, falso positivo del ### y AUC de ###.
 
 
 
