@@ -14,6 +14,8 @@ knit: (function(inputFile, encoding) {
   rmarkdown::render(inputFile, encoding = encoding,
   output_format = "all",
   output_dir = "results") })
+# And:
+# https://stackoverflow.com/a/46007686/10647267
 
 ---
 
@@ -284,13 +286,31 @@ Por la forma de los histogramas, y los rangos de valores en los que se mueven, p
 ## Contraste de valores medios (t-test)
 
 ```{r test t}
+#Check if the file already exists
+if(file.exists("./results/variables_t_test.RData")){
+  load("./results/variables_t_test.RData")
+}else{
+# Contraste de valores medios (t-test)
 # Código adaptado de
 # https://stackoverflow.com/questions/13790611/apply-t-test-on-many-columns-in-a-dataframe-split-by-factor
 variables_t_test <- t(sapply(image_vectors[c(-1,-2)], function(x)
   unlist(t.test(x~image_vectors$cat)[c("estimate", "p.value")])))
+save(variables_t_test, file = "./results/variables_t_test.RData")
+}
+# This if-else block is to avoid re-calculating 
+# the object every time I want to try the code.
+# I have just have care to remove the .RData file
+# if I want to re-calculate it.
+
+## TODO Refactoriza todos los casos en los que NO realizo un cálculo si determinado fichero ya existe => Convertir en función
+
+# Código adaptado de
+# https://stackoverflow.com/questions/13790611/apply-t-test-on-many-columns-in-a-dataframe-split-by-factor
+#variables_t_test <- t(sapply(image_vectors[c(-1,-2)], function(x)
+#  unlist(t.test(x~image_vectors$cat)[c("estimate", "p.value")])))
 ```
 
-```{r ajustar p-valores por correccion de Benjamini & Hochberg (BH)}
+```{r ajustar p-valores por correccion de Benjamini & Hochberg (BH), results='asis'}
 variables_t_test_adjusted <- as.data.frame(variables_t_test)
 variables_t_test_adjusted[,3] <- p.adjust(variables_t_test_adjusted[,3])
 # Ordenar los valores de menor a mayor
@@ -299,10 +319,11 @@ ordered_p_values <- variables_t_test_adjusted[order(variables_t_test[,3]),]
 ordered_p_values[, "diferencia"] <- ordered_p_values[,1] - ordered_p_values[,2]
 # Preparar para mostrar como tabla
 library(xtable)
-xtable(ordered_p_values[1:25,-c(1,2)],
+adjusted_table <- xtable(ordered_p_values[1:25,-c(1,2)],
        caption = "Tabla con los 25 descriptores de menor p-valor",
        digits = 4,
        display=c("s", "e", "fg"))
+print(adjusted_table, type="html")
 ```
 
 Me llama la atención que en estos descriptores estadísticamente más significativos, la diferencia entre las medias del grupo "derrame"" y del grupo "normal" es de alrededor del 20%.
