@@ -54,6 +54,8 @@ file.remove(c("clasificacion-radiografias.html",
 # ...
 
 library(knitr)
+#library(kableExtra)
+#library(magrittr)
 library('OpenImageR')
 library('class')
 library('gmodels')
@@ -80,7 +82,33 @@ fort_deb <- matrix(c("*Simple y efectivo",
               "* Se requiere procesado adicional para características nominales y datos incompletos"),
               ncol=2)
 col_names <- c("Fortalezas", "Debilidades")
-kable(fort_deb, col.names = col_names)
+
+fordeb <- as.data.frame(cbind(
+  Fortalezas=c("Simple y efectivo",
+               ".",
+              "No hace asunciones acerca de",
+              " la distribución subyacente de los datos",
+              ".",
+              "Fase de entrenamiento rápida",
+              ".",
+              ".",
+              ".",
+              ".",
+              "."),
+  Debilidades=c("No produce un modelo, limitando la habilidad",
+                " para entender cómo las características se",
+                " relacionan con la clasificación",
+                ".",
+              "Requiere seleccionar una _k_ adecuada",
+              ".",
+              "Fase de clasificación lenta",
+              ".",
+              "Se requiere procesado adicional",
+              "para características nominales",
+              "y datos incompletos")),
+  stringsAsFactors = FALSE)
+
+kable(fordeb)
 ```
 
 
