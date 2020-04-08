@@ -54,6 +54,10 @@ file.remove(c("clasificacion-radiografias.html",
 # ...
 
 library(knitr)
+library('OpenImageR')
+library('class')
+library('gmodels')
+library(ROCR)
 ```
 \newpage
 # Algoritmo k-NN
@@ -99,7 +103,6 @@ if (! dir.exists("./dataset")) {
 ```
 
 ```{r function image to vector}
-library('OpenImageR')
 
 image_tovector <- function(x){
 # Create filepath
@@ -373,8 +376,6 @@ El set de prueba (`r observaciones*test` observaciones en este caso) sirve para 
 
 # Evaluación de diferentes valores de _k_
 ```{r classify the test data and evaluate different k values}
-library('class')
-library('gmodels')
 
 k <- c(3, 5, 7, 11, 23, 45, 67)
 
@@ -429,7 +430,6 @@ Un clasificador perfecto detectaría todos los positivos antes de detectar ning�
 En los siguientes gráficos están representadas tanto las curvas ROC como los valores AUC para cada valor de k:
 
 ```{r create ROC curve}
-library(ROCR)
 
 # Necesitaremos los valores reales:
 # image_vectors_test_labels
