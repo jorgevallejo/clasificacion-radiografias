@@ -406,7 +406,7 @@ knitr::kable(dtevaluated_k,
              align = c("c","c","c","c"))
 ```
 
-Si priorizamos los falsos negativos, que son lo que potencialmente suponen un mayor perjuicio para el paciente, el k más adecuado sería`r evaluated_k[1, (which.min(evaluated_k[2,]))]`; que nos proporciona un valor del `r noquote(paste0(evaluated_k[2, (which.min(evaluated_k[2,]))], "%"))` de falsos positivos.
+Si priorizamos los falsos negativos, que son lo que potencialmente suponen un mayor perjuicio para el paciente, el k más adecuado sería `r evaluated_k[1, (which.min(evaluated_k[2,]))]`; que nos proporciona un valor del `r noquote(paste0(round(evaluated_k[2, (which.min(evaluated_k[2,]))], digits=3)*100, "%"))` de falsos positivos.
 
 ## Análisis de rendimiento. Curvas ROC y AUC
 
@@ -498,13 +498,13 @@ text(0.1, y = 0.9, labels = paste0("AUC: ", round(auc_values[[i]], digits = 2)))
 
 Una vez calculadas las curvas ROC y los valores de AUC, podemos ver que el mayor AUC (`r round(unlist((auc_values[which.max(auc_values)])), digits = 2)`) corresponde al valor de k = `r k[which.max(auc_values)]`.
 
-El valor k para el mínimo de falsos negativos (`r noquote(paste0(evaluated_k[2, (which.min(evaluated_k[2,]))], "%"))`) corresponde a k = `r evaluated_k[1, (which.min(evaluated_k[2,]))]`.
+El valor k para el mínimo de falsos negativos (`r noquote(paste0(round(evaluated_k[2, (which.min(evaluated_k[2,]))], digits=3)*100, "%"))`) corresponde a k = `r evaluated_k[1, (which.min(evaluated_k[2,]))]`.
 
-El valor k para el mínimo de falsos positivos (`r noquote(paste0(evaluated_k[3, (which.min(evaluated_k[3,]))], "%"))`) corresponde a k = `r evaluated_k[1, (which.min(evaluated_k[3,]))]`.
+El valor k para el mínimo de falsos positivos (`r noquote(paste0(round(evaluated_k[3, (which.min(evaluated_k[3,]))], digits=3)*100, "%"))`) corresponde a k = `r evaluated_k[1, (which.min(evaluated_k[3,]))]`.
 
-El valor k para el error total mínimo (`r noquote(paste0(evaluated_k[3, (which.min(apply(evaluated_k[2:3,], 2, sum)))], "%"))`) es `r evaluated_k[1, (which.min(apply(evaluated_k[2:3,], 2, sum)))]`.
+El valor k para el error total mínimo (`r noquote(paste0(round(min(apply(evaluated_k[2:3,], 2, sum)), digits=3)*100, "%"))`) es `r evaluated_k[1, (which.min(apply(evaluated_k[2:3,], 2, sum)))]`.
 
-Dado que el error potencialmente más perjudicial para el paciente son los falsos negativos, deberíamos elegir el valor de k = `r evaluated_k[1, (which.min(evaluated_k[2,]))]`. Este resulta en un falso negativo del `r noquote(paste0(evaluated_k[2, (which.min(evaluated_k[2,]))], "%"))`, falso positivo del `r noquote(paste0(evaluated_k[3, (which.min(evaluated_k[2,]))], "%"))` y AUC de `r round(unlist((auc_values[which.min(evaluated_k[2,])])), digits = 2)`.
+Dado que el error potencialmente más perjudicial para el paciente son los falsos negativos, deberíamos elegir el valor de k = `r evaluated_k[1, (which.min(evaluated_k[2,]))]`. Este resulta en un falso negativo del `r noquote(paste0(round(evaluated_k[2, (which.min(evaluated_k[2,]))], digits=3)*100, "%"))`, falso positivo del `r noquote(paste0(round(evaluated_k[3, (which.min(evaluated_k[2,]))], digits=3)*100, "%"))` y AUC de `r round(unlist((auc_values[which.min(evaluated_k[2,])])), digits = 2)`.
 
 
 \newpage
