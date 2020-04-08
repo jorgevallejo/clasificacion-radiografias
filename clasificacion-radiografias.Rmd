@@ -82,10 +82,11 @@ kable(fort_deb, col.names = col_names)
 
 # Pre-procesado de datos
 
-Las imágenes a clasificar deberán estar en una carpeta llamada "dataset", en el mismo directorio que el código que vamos a correr.
 ```{r set directories structure}
 dir.create("./results", showWarnings = FALSE)
 
+# Las imágenes a clasificar deberán estar en una carpeta llamada "dataset",
+# en el mismo directorio que el código que vamos a correr.
 if (! dir.exists("./dataset")) {
   stop("El directorio ./dataset no existe")
 }
@@ -192,13 +193,11 @@ if( ! file.exists("./results/RX_Torax_4097.csv")){
 # especially if I just want to test knitting
 ```
 
-### Lectura de datos
 ```{r lectura del fichero csv}
 image_vectors <- read.csv2("./results/RX_Torax_4097.csv")
 ```
 
-
-### Estructura de los datos
+## Estructura de los datos
 ```{r examine data structure}
 observaciones <- nrow(image_vectors)
 variables <- ncol(image_vectors)-2
@@ -219,7 +218,7 @@ kable(table(image_vectors$cat),
       align = c('r','l'))
 ```
 
-### Histograma de medias
+## Histogramas de las medias
 
 ```{r calcula la media de cada variable}
 image_vectors_normal <- image_vectors[image_vectors$cat == 'n',]
@@ -260,6 +259,7 @@ hist(media_effusion,
 
 Los valores medios de las variables en la clase "normal" parecen estar más concentrados en el centro de la distribución, mientras que en la clase "effusion" la distribución es más achatada. Esto podría significar que las imágenes de la clase "effusion" presentan áreas más claras y más oscuras que las imágenes de la clase "normal".
 
+## Histogramas de las desviaciones típicas
 ```{r max histogramas desviación típica, include=FALSE}
 # Para calcular los rangos de las frecuencias
 hsn <- hist(sd_normal)
@@ -288,8 +288,9 @@ hist(sd_effusion,
 Por la forma de los histogramas, y los rangos de valores en los que se mueven, parece que las variales en las observaciones de clase "effusion" presentan valores de desviación típica mayores que las variables en la clase "normal".
 
 
-## Contraste de valores medios (t-test)
+## Contraste de valores medios (t de Student)
 
+Utilizando el test de la t de Student, hemos comparado los descriptores de ambos grupos de observaciones. Una vez ajustados los p-valores según el método BH, para tener en cuenta que estamos haciendo comparaciones múltiples, podemos ver en la siguiente tabla los 25 descriptores estadísticamente más significativos y la diferencia entre las medias de ambos grupos para cada descriptor.
 ```{r test t}
 #Check if the file already exists
 if(file.exists("./results/variables_t_test.RData")){
@@ -334,23 +335,23 @@ kable(ordered_p_values[1:25,-c(1,2)],
 #print(adjusted_table, type="latex", comment = FALSE)
 ```
 
-Me llama la atención que en estos descriptores estadísticamente más significativos, la diferencia entre las medias del grupo "derrame"" y del grupo "normal" es de alrededor del 20%.
+Me llama la atención que en estos descriptores estadísticamente más significativos, la diferencia entre las medias del grupo "derrame"" y del grupo "normal" es de alrededor del 20%, que no parece especialmente grande.
 
 ```{r}
 ## TODO: Normalizar los p-valores ajustados, asociarlos a una escala de color y reconstruir la imagen para saber qué zonas de la imagen son más informativas.
 ```
 
-## Implementación del algoritmo knn
-
-Dividimos el set de datos, al azar, en un set de entrenamiento (67% de las observaciones) y un set de prueba (33% de los datos).
+# Exploración con el algoritmo k-NN
 
 ```{r separa sets entrenamiento y prueba}
+train <- 0.67
+test <- 1-train
 set.seed(123)
 # Reordered row numbers
 observaciones <- nrow(image_vectors)
 shuffled_rows <- sample(observaciones)
-training_rows <- shuffled_rows[1:(observaciones*0.67)]
-test_rows <- shuffled_rows[((observaciones*0.67)+1):observaciones]
+training_rows <- shuffled_rows[1:(observaciones*train)]
+test_rows <- shuffled_rows[((observaciones*train)+1):observaciones]
 # Remember to use only numeric variables
 image_vectors_training <- image_vectors[training_rows, 3:ncol(image_vectors)]
 image_vectors_test <- image_vectors[test_rows, 3:ncol(image_vectors)]
@@ -358,9 +359,19 @@ image_vectors_test <- image_vectors[test_rows, 3:ncol(image_vectors)]
 # Category labels
 image_vectors_train_labels <- image_vectors[training_rows, 1]
 image_vectors_test_labels <- image_vectors[test_rows, 1]
+
+## TODO Para el número de filas que se usan como set de entrenamiento,
+# hay que tener en cuenta un redondeo para las ocasiones en que no haya
+# múltiplos exactos.
 ```
 
-## Evalúa diferentes valores de k
+Antes de aplicar el algoritmo hemos dividido el set de datos, al azar, en un set de entrenamiento (`r noquote(paste0(train*100,"%"))` de las observaciones) y un set de prueba (`r noquote(paste0(test*100,"%"))` de los datos).
+
+El set de entrenamiento (`r observaciones*train` observaciones en este caso) es la referencia que usa el algoritmo para realizar la clasifición de las observaciones.
+
+El set de prueba (`r observaciones*test` observaciones en este caso) sirve para evaluar la capacidad del algoritmo para clasificar correctamente cada observación dentro del grupo que le corresponde.
+
+# Evaluación de diferentes valores de _k_
 ```{r classify the test data and evaluate different k values}
 library('class')
 library('gmodels')
@@ -495,7 +506,7 @@ text(0.1, y = 0.9, labels = paste0("AUC: ", round(auc_values[[i]], digits = 2)))
 ```
 
 
-## Comentario
+# Comentario
 
 Una vez calculadas las curvas ROC y los valores de AUC, podemos ver que el mayor AUC (`r round(unlist((auc_values[which.max(auc_values)])), digits = 2)`) corresponde al valor de k = `r k[which.max(auc_values)]`.
 
