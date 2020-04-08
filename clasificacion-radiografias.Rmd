@@ -9,6 +9,7 @@ output:
       toc_float: true
   pdf_document:
       toc: true
+      #pandoc_args: -V toc-title="Sumario"
 # Next code for knitting both types of documents automatically comes from https://stackoverflow.com/questions/39662365/knit-one-markdown-file-to-two-output-files/53280491#53280491
 knit: (function(inputFile, encoding) {
   rmarkdown::render(inputFile, encoding = encoding,
@@ -54,7 +55,7 @@ file.remove(c("clasificacion-radiografias.html",
 
 library(knitr)
 ```
-
+\newpage
 # Algoritmo k-NN
 
 El algoritmo de los k vecinos más próximos (_k-nearest neighbours_) es un algoritmo de aprendizaje automático (_machine learning_) que se utiliza para clasificar observaciones, según si sus características las hacen más parecidas a uno u otro grupo ya establecidos.  
