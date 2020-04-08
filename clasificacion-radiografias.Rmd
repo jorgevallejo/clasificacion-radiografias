@@ -161,7 +161,7 @@ image_vectors <- as.data.frame(t(image_vectors))
 ```
 
 ```{r test images in rows, eval=FALSE}
-## How to check if each row if really an x-ray image:
+## How to check if each row is really an x-ray image:
 test_row <- function(x){
 # Extract one row of the dataframe and store as a numeric vector
  test <- as.numeric(image_vectors[x,])
@@ -202,9 +202,13 @@ image_vectors <- read.csv2("./results/RX_Torax_4097.csv")
 observaciones <- nrow(image_vectors)
 variables <- ncol(image_vectors)-2
  
+clases <- length(directories)
+niveles <- levels(image_vectors$cat)
 ```
 
-El set de datos examinado está compuesto por `r observaciones` observaciones, de las cuales se han tomado `r variables` variables, y están divididas en `r length(directories)` clases (`r directories`) codificadas como `r levels(image_vectors$cat)`.
+El set de datos examinado está compuesto por `r observaciones` observaciones.  
+De cada observación se han tomado `r variables` variables.  
+El conjunto de observaciones está dividido en `r clases` clases (`r directories[1:clases-1]` y `r directories[-1]`), codificadas como `r niveles[1:length(niveles)-1]` y `r niveles[-1]`.
 
 La distribución de cada clase es la siguiente:
 
