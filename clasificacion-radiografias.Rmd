@@ -303,11 +303,6 @@ save(variables_t_test, file = "./results/variables_t_test.RData")
 # if I want to re-calculate it.
 
 ## TODO Refactoriza todos los casos en los que NO realizo un cálculo si determinado fichero ya existe => Convertir en función
-
-# Código adaptado de
-# https://stackoverflow.com/questions/13790611/apply-t-test-on-many-columns-in-a-dataframe-split-by-factor
-#variables_t_test <- t(sapply(image_vectors[c(-1,-2)], function(x)
-#  unlist(t.test(x~image_vectors$cat)[c("estimate", "p.value")])))
 ```
 
 ```{r ajustar p-valores por correccion de Benjamini & Hochberg (BH), results='asis'}
@@ -317,13 +312,21 @@ variables_t_test_adjusted[,3] <- p.adjust(variables_t_test_adjusted[,3])
 ordered_p_values <- variables_t_test_adjusted[order(variables_t_test[,3]),]
 # Añadir columna con diferencia de medias
 ordered_p_values[, "diferencia"] <- ordered_p_values[,1] - ordered_p_values[,2]
+ordered_p_values$p.value <- format(ordered_p_values$p.value, digits = 4)
 # Preparar para mostrar como tabla
-library(xtable)
-adjusted_table <- xtable(ordered_p_values[1:25,-c(1,2)],
-       caption = "Tabla con los 25 descriptores de menor p-valor",
-       digits = 4,
-       display=c("s", "e", "fg"))
-print(adjusted_table, type="html")
+kable(ordered_p_values[1:25,-c(1,2)],
+      caption = "Tabla con los 25 descriptores de menor p-valor",
+      digits = 4,
+      col.names = c("p-valores", "Diferencia"),
+      scientific=TRUE)
+
+
+#library(xtable)
+#adjusted_table <- xtable(ordered_p_values[1:25,-c(1,2)],
+#       caption = "Tabla con los 25 descriptores de menor p-valor",
+#       digits = 4,
+#       display=c("s", "e", "fg"))
+#print(adjusted_table, type="latex", comment = FALSE)
 ```
 
 Me llama la atención que en estos descriptores estadísticamente más significativos, la diferencia entre las medias del grupo "derrame"" y del grupo "normal" es de alrededor del 20%.
