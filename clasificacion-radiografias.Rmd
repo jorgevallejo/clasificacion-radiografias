@@ -38,10 +38,12 @@ knitr::opts_knit$set(stop_on_error = 2L)
 # Remember that the .RData files are there to
 # avoid unnecesarily redoing long data processing.
 
-file.remove(c("clasificacion-radiografias.html",
-              "clasificacion-radiografias.pdf",
+file.remove(c("./results/clasificacion-radiografias.html",
+              "./results/clasificacion-radiografias.pdf",
               "./results/evaluated_k.RData",
               "./results/prob_pred.RData",
+              "./results/variables_t_test.RData",
+              "./results/image_vectors.RData",
               "./results/RX_Torax_4097.csv"))
 
 
@@ -72,17 +74,6 @@ En una primera fase de 'entrenamiento', una colección de observaciones ya clasi
 ## Fortalezas y debilidades del algoritmo
 
 ```{r fortalezas debilidades, message=FALSE, results='asis'}
-fort_deb <- matrix(c("*Simple y efectivo",
-              "* No hace asunciones acerca de la distribución subyacente de los datos",
-              "* Fase de entrenamiento rápida",
-              " ",
-              "* No produce un modelo, limitando la habilidad para entender cómo las características se relacionan con la clasificación",
-              "* Requiere seleccionar una _k_ adecuada",
-              "* Fase de clasificación lenta",
-              "* Se requiere procesado adicional para características nominales y datos incompletos"),
-              ncol=2)
-col_names <- c("Fortalezas", "Debilidades")
-
 fordeb <- as.data.frame(cbind(
   Fortalezas=c("Simple y efectivo",
                ".",
@@ -456,7 +447,6 @@ Las curvas ROC (Receiver Operating Characteristic) son un método de análisis d
 Un clasificador perfecto detectaría todos los positivos antes de detectar ningún falso negativo. Una forma de medir cuánto se acerca el rendimiento de nuestro clasificador al del clasificador perfecto es mediante el estadístico AUC (area under the ROC curve).
 
 En los siguientes gráficos están representadas tanto las curvas ROC como los valores AUC para cada valor de k:
-
 ```{r create ROC curve}
 
 # Necesitaremos los valores reales:
@@ -521,9 +511,9 @@ perf.aucs <- lapply(prediction_objects,
 auc_values <- lapply(perf.aucs, function (x) unlist(x@y.values))
 ```
 
-```{r draw ROC curve, fig.height = 20, fig.width = 8}
+```{r draw ROC curve, fig.height = 13, fig.width = 12}
 # Draw ROC curve
-par(mfrow=c(4,2))
+par(mfrow=c(3,3))
 for(i in 1:length(performance_objects)){
 plot(performance_objects[[i]],
      main=paste0("Curva ROC para k = ",k[i]),
