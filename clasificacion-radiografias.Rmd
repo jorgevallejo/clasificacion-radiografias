@@ -390,8 +390,21 @@ kable(ordered_p_values[1:25,-c(1,2)],
 
 Me llama la atención que en estos descriptores estadísticamente más significativos, la diferencia entre las medias del grupo "derrame"" y del grupo "normal" es de alrededor del 20%, que no parece especialmente grande.
 
-```{r}
+### Mapa de significatividad
+
+A partir de los p-valores corregidos, hemos generado un gráfico en el que quedan señaladas lás áreas más significativas del conjunto de imágenes a la hora de comparar los diferentes grupos entre ellos. En escala de grises, los píxeles con un p-valor más alto (menos significativo) aparecen más oscuros; y aquellos con p-valor más bajo aparecen más claros:
+```{r informative pixels, fig.height=4, fig.width=4}
 ## TODO: Normalizar los p-valores ajustados, asociarlos a una escala de color y reconstruir la imagen para saber qué zonas de la imagen son más informativas.
+
+# p-valores ajustados en forma de matriz
+p_valor_matriz <- matrix(variables_t_test_adjusted[ , 3], ncol = 64)
+# dibuja la imagen, con rotación de la matriz
+image(
+    t(apply(p_valor_matriz, 2, rev)),
+    col=gray.colors(4096, rev = TRUE, start=0, end = 1),
+    xaxt="n",
+    yaxt="n",
+    main="Mapa de significatividad")
 ```
 
 # Exploración con el algoritmo k-NN
