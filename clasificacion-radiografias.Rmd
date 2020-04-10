@@ -240,6 +240,37 @@ kable(table(image_vectors$cat),
       align = c('r','l'))
 ```
 
+## Ejemplos de observaciones de las diferentes clases
+
+```{r example images, , fig.height = 4, fig.width = 8, results= 'hide'}
+set.seed(123)
+# Muestra al azar de la dataframe image_vectors
+ejemplo <- function(x){
+  subgrupo <- image_vectors[image_vectors$cat==x]
+  muestra <- image_vectors[sample(nrow(subgrupo), 1), 3:ncol(image_vectors)]
+  test <- matrix(as.numeric(muestra), ncol = 64)
+  # Code for rotating the matrix from:
+  # https://www.r-bloggers.com/creating-an-image-of-a-matrix-in-r-using-image/
+  return(image(
+    t(apply(test, 2, rev)),
+    col=gray.colors(512),
+    xaxt="n",
+    yaxt="n",
+    main=paste0("Ejemplo de la clase '", x, "'."))
+  )
+}
+
+
+par(mfrow=c(1,2))
+sapply(niveles, ejemplo)
+```
+
+
+
+```{r eval=FALSE}
+Ejemplo de imágenes de ambas clases:
+![`r directories[1]`](./dataset/effusion/effusion0.png)![`r directories[2]`](./dataset/normal/normal0.png)
+```
 ## Histogramas de las medias
 
 ```{r calcula la media de cada variable}
