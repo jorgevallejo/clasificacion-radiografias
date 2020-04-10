@@ -392,9 +392,10 @@ Me llama la atención que en estos descriptores estadísticamente más significa
 
 ### Mapa de significatividad
 
-A partir de los p-valores corregidos, hemos generado un gráfico en el que quedan señaladas lás áreas más significativas del conjunto de imágenes a la hora de comparar los diferentes grupos entre ellos. En escala de grises, los píxeles con un p-valor más alto (menos significativo) aparecen más oscuros; y aquellos con p-valor más bajo aparecen más claros:
-```{r informative pixels, fig.height=4, fig.width=4}
-## TODO: Normalizar los p-valores ajustados, asociarlos a una escala de color y reconstruir la imagen para saber qué zonas de la imagen son más informativas.
+A partir de los p-valores corregidos, hemos generado un gráfico en el que quedan señaladas lás áreas más significativas del conjunto de imágenes a la hora de comparar los diferentes grupos entre ellos. En escala de grises, los píxeles con un p-valor más alto (menos significativo) aparecen más oscuros; y aquellos con p-valor más bajo (más significativos) aparecen más claros:
+
+```{r informative pixels, fig.height=4, fig.width=4, fig.align="center"}
+## Normalizar los p-valores ajustados, asociarlos a una escala de color y reconstruir la imagen para saber qué zonas de la imagen son más informativas.
 
 # p-valores ajustados en forma de matriz
 p_valor_matriz <- matrix(variables_t_test_adjusted[ , 3], ncol = 64)
@@ -407,6 +408,7 @@ image(
     main="Mapa de significatividad")
 ```
 
+\newpage
 # Exploración con el algoritmo k-NN
 
 ```{r separa sets entrenamiento y prueba}
@@ -437,7 +439,7 @@ El set de entrenamiento (`r observaciones*train` observaciones en este caso) es 
 
 El set de prueba (`r observaciones*test` observaciones en este caso) sirve para evaluar la capacidad del algoritmo para clasificar correctamente cada observación dentro del grupo que le corresponde.
 
-# Evaluación de diferentes valores de _k_
+## Evaluación de diferentes valores de _k_
 ```{r classify the test data and evaluate different k values}
 
 k <- c(3, 5, 7, 11, 23, 45, 67)
@@ -484,6 +486,7 @@ knitr::kable(dtevaluated_k,
 
 Si priorizamos los falsos negativos, que son lo que potencialmente suponen un mayor perjuicio para el paciente, el k más adecuado sería `r evaluated_k[1, (which.min(evaluated_k[2,]))]`; que nos proporciona un valor del `r noquote(paste0(round(evaluated_k[2, (which.min(evaluated_k[2,]))], digits=3)*100, "%"))` de falsos positivos.
 
+\newpage
 ## Análisis de rendimiento. Curvas ROC y AUC
 
 Las curvas ROC (Receiver Operating Characteristic) son un método de análisis de rendimiento que se usa para determinar el punto de equilibrio entre la capacidad de detectar positivos auténticos, y la de evitar falsos positivos.
