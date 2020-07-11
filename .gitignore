@@ -3,11 +3,13 @@
 .RData
 .Ruserdata
 
-[images]
-dataset/
+#[images]
+#dataset/
 /*.png
 
 [results]
-/*.RData
-results/
+*.RData
+# results/
 clasificacion-radiografias_files
+*.zip
+*.csv
